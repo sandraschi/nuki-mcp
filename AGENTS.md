@@ -7,3 +7,5 @@ status, and execute multi-step entry sequences (buzz main door → unlock
 apartment). Designed for Stroheckgasse, Vienna.
 
 Requires Home Assistant with Nuki integration, HASS_URL and HASS_TOKEN.
+
+Install docs: follow mcp-central-docs/standards/AGENT_INSTALL_REFERENCE.md
