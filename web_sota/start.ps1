@@ -1,33 +1,53 @@
-﻿Param([switch]$Headless)
+﻿param(
+    [switch]$Headless,
+    [switch]$BackendOnly,
+    [switch]$NoBrowser
+)
 
-# --- SOTA Headless Standard ---
-if ($Headless -and ($Host.UI.RawUI.WindowTitle -notmatch 'Hidden')) {
-    Start-Process pwsh -ArgumentList '-NoProfile', '-File', $PSCommandPath, '-Headless' -WindowStyle Hidden
-    exit
-}
-$WindowStyle = if ($Headless) { 'Hidden' } else { 'Normal' }
-# ------------------------------
-
-# start.ps1 for Nuki MCP (Relocated to web_sota)
-$FrontendPort = 10892
+$FrontendPort = 10980
 $BackendPort = 10894
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 
-# Clear port squatters
-Write-Host "Clearing ports $FrontendPort and $BackendPort..." -ForegroundColor Cyan
-$pids = Get-NetTCPConnection -LocalPort $FrontendPort, $BackendPort -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 4 } | Select-Object -ExpandProperty OwningProcess -Unique
-foreach ($p in $pids) {
-    Write-Host "Found squatter (PID: $p). Terminating..." -ForegroundColor Red
-    try { Stop-Process -Id $p -Force -ErrorAction Stop } catch { Write-Host "Warning: Could not terminate PID $p." -ForegroundColor Gray }
+$FleetStartPath = Join-Path $ProjectRoot "scripts\FleetStartMode.ps1"
+if (-not (Test-Path -LiteralPath $FleetStartPath)) {
+    Write-Host "ERROR: Missing vendored launcher helper: $FleetStartPath" -ForegroundColor Red
+    exit 1
+}
+. $FleetStartPath
+$FleetStart = Initialize-FleetStartMode @PSBoundParameters
+Enter-FleetHeadlessConsole -Headless:$Headless -BackendOnly:$BackendOnly
+Stop-FleetPortSquatters -Ports @($FrontendPort, $BackendPort) -Label "nuki-mcp"
+
+Write-Host "Starting Nuki MCP Backend on port $BackendPort..." -ForegroundColor Green
+$backendCmd = "Set-Location '$ProjectRoot'; uv run --project '$ProjectRoot' uvicorn nuki_mcp.main:app --host 127.0.0.1 --port $BackendPort --log-level info"
+Start-Process powershell -ArgumentList "-NoProfile", "-WindowStyle", "Normal", "-Command", $backendCmd
+
+$healthUrl = "http://127.0.0.1:$BackendPort/health"
+$attempt = 0
+while ($attempt -lt 45) {
+    try {
+        $null = Invoke-WebRequest -Uri $healthUrl -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
+        Write-Host "Backend ready at $healthUrl" -ForegroundColor Green
+        break
+    } catch {
+        Start-Sleep -Seconds 2
+        $attempt++
+    }
 }
 
-Write-Host "Starting Nuki MCP Backend..." -ForegroundColor Green
-# Backend (nuki_mcp) in repo root src/; run from repo root so package resolves
-$backendCmd = "Set-Location '$ProjectRoot'; uv run uvicorn nuki_mcp.main:app --host 127.0.0.1 --port $BackendPort --log-level info"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", $backendCmd -WindowStyle Normal
+if (-not $FleetStart.RunFrontend) {
+    while ($true) { Start-Sleep -Seconds 60 }
+}
 
-Write-Host "Starting Nuki MCP Frontend..." -ForegroundColor Green
 Set-Location $PSScriptRoot
 if (-not (Test-Path "node_modules")) { npm install }
+
+if (-not $NoBrowser) {
+    $frontendUrl = "http://127.0.0.1:$FrontendPort/"
+    $pollAndOpen = "for (`$i = 0; `$i -lt 60; `$i++) { try { `$null = Invoke-WebRequest -Uri '$frontendUrl' -TimeoutSec 2 -UseBasicParsing -ErrorAction Stop; Start-Process '$frontendUrl'; exit } catch { Start-Sleep -Seconds 1 } }"
+    Start-Process powershell -ArgumentList "-NoProfile", "-WindowStyle", "Hidden", "-Command", $pollAndOpen
+}
+
+Write-Host "Starting Nuki MCP Frontend on port $FrontendPort..." -ForegroundColor Green
 npm run dev -- --port $FrontendPort --host
 

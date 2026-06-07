@@ -1,8 +1,8 @@
-set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
+﻿set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
 
 # Open the interactive recipe dashboard in the browser
 default:
-    @pwsh.exe -NoProfile -ExecutionPolicy Bypass -File ../mcp-central-docs/scripts/just-dashboard.ps1 -Path .
+    @just --list
 
 # ── Quality ───────────────────────────────────────────────────────────────────
 
@@ -81,3 +81,4 @@ mcpb-pack:
 
 install-mcp client="print":
     .\install-mcp.ps1 '{{client}}'
+
