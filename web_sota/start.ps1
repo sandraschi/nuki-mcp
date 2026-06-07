@@ -18,6 +18,8 @@ $FleetStart = Initialize-FleetStartMode @PSBoundParameters
 Enter-FleetHeadlessConsole -Headless:$Headless -BackendOnly:$BackendOnly
 Stop-FleetPortSquatters -Ports @($FrontendPort, $BackendPort) -Label "nuki-mcp"
 
+if (-not (Assert-FleetPortsAvailable -Ports @($FrontendPort, $BackendPort) -Label "nuki-mcp")) { exit 1 }
+
 Write-Host "Starting Nuki MCP Backend on port $BackendPort..." -ForegroundColor Green
 $backendCmd = "Set-Location '$ProjectRoot'; uv run --project '$ProjectRoot' uvicorn nuki_mcp.main:app --host 127.0.0.1 --port $BackendPort --log-level info"
 Start-Process powershell -ArgumentList "-NoProfile", "-WindowStyle", "Normal", "-Command", $backendCmd
@@ -50,4 +52,5 @@ if (-not $NoBrowser) {
 
 Write-Host "Starting Nuki MCP Frontend on port $FrontendPort..." -ForegroundColor Green
 npm run dev -- --port $FrontendPort --host
+
 
