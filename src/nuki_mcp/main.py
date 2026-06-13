@@ -103,7 +103,16 @@ def nuki_security_dashboard():
 
 
 # ASGI app for uvicorn (frontend proxy / HTTP transport)
+from starlette.responses import JSONResponse
+from starlette.routing import Route
+
+
+async def _health(_request):
+    return JSONResponse({"status": "ok", "service": "nuki-mcp"})
+
+
 app = mcp.http_app()
+app.routes.insert(0, Route("/health", _health, methods=["GET"]))
 
 if __name__ == "__main__":
     mcp.run()

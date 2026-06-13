@@ -1,8 +1,8 @@
-param(
+﻿param(
     [switch]$Headless,
     [switch]$BackendOnly,
-    [switch]$NoBrowser,
-    [switch]$ReuseIfRunning)
+    [switch]$NoBrowser
+)
 
 $FrontendPort = 10980
 $BackendPort = 10894
@@ -16,21 +16,9 @@ if (-not (Test-Path -LiteralPath $FleetStartPath)) {
 . $FleetStartPath
 $FleetStart = Initialize-FleetStartMode @PSBoundParameters
 Enter-FleetHeadlessConsole -Headless:$Headless -BackendOnly:$BackendOnly
+Stop-FleetPortSquatters -Ports @($FrontendPort, $BackendPort) -Label "nuki-mcp"
 
-$portResolve = @{
-    Ports      = @($FrontendPort, $BackendPort)
-    Label      = "nuki-mcp"
-    AllowReuse = $ReuseIfRunning
-}
-if ($ReuseIfRunning) {
-    $portResolve.HealthChecks = @{
-        $FrontendPort = "http://127.0.0.1:$FrontendPort/"
-        $BackendPort = "http://127.0.0.1:$BackendPort/health"
-    }
-}
-$portState = Resolve-FleetPortConflict @portResolve
-if ($portState.Action -eq 'Blocked') { exit 1 }
-if ($portState.Reuse) { return }
+if (-not (Assert-FleetPortsAvailable -Ports @($FrontendPort, $BackendPort) -Label "nuki-mcp")) { exit 1 }
 
 Write-Host "Starting Nuki MCP Backend on port $BackendPort..." -ForegroundColor Green
 $backendCmd = "Set-Location '$ProjectRoot'; uv run --project '$ProjectRoot' uvicorn nuki_mcp.main:app --host 127.0.0.1 --port $BackendPort --log-level info"
