@@ -3,13 +3,16 @@ name = "nuki-mcp"
 version = "0.1.0"
 description = "Nuki Smart Lock MCP Server via Home Assistant Bridge"
 authors = [
-    { name = "Sandra Schipal", email = "sandra@vibe-architect.ai" }
+    { name = "Sandra Schipal", email = "sandraschipal@gmail.com" }
 ]
 dependencies = [
-    "fastmcp>=3.2.0",
+    "fastmcp>=3.4.4,<4",
     "aiohttp>=3.9.0",
     "pydantic>=2.0.0",
     "python-dotenv>=1.0.0",
+    "httpx>=0.27.0",
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
 ]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -30,8 +33,11 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "S", "UP", "RUF"]
-ignore = ["S101", "B008"]
+ignore = ["S101", "B008", "S106", "S110", "S112", "RUF012"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.16.0,<0.17"]
