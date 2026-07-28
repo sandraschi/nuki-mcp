@@ -1,11 +1,10 @@
 import asyncio
-import logging
 import os
-from typing import Any
-
-from dotenv import load_dotenv
+import logging
+from typing import Any, Dict
 from fastmcp import FastMCP
 from pydantic import Field
+from dotenv import load_dotenv
 
 from .bridge.hass import HomeAssistantBridge
 
@@ -29,8 +28,10 @@ mcp = FastMCP("Nuki Smart Lock")
 
 @mcp.tool()
 async def get_lock_status(
-    entity_id: str = Field(..., description="The Home Assistant entity ID (e.g., lock.front_door)"),
-) -> dict[str, Any]:
+    entity_id: str = Field(
+        ..., description="The Home Assistant entity ID (e.g., lock.front_door)"
+    ),
+) -> Dict[str, Any]:
     """Get the current state and attributes of a Nuki lock."""
     state = await bridge.get_state(entity_id)
     if not state:
@@ -45,7 +46,9 @@ async def get_lock_status(
 
 
 @mcp.tool()
-async def set_lock_state(entity_id: str, action: str = Field(..., pattern="^(lock|unlock)$")) -> str:
+async def set_lock_state(
+    entity_id: str, action: str = Field(..., pattern="^(lock|unlock)$")
+) -> str:
     """Lock or unlock a Nuki device."""
     success = await bridge.call_service("lock", action, entity_id)
     if success:

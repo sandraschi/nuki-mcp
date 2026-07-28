@@ -1,0 +1,25 @@
+{
+  "manifest_version": "0.2",
+  "name": "nuki-mcp",
+  "version": "0.1.0",
+  "description": "Nuki Smart Lock MCP Server via Home Assistant Bridge",
+  "author": { "name": "sandraschi" },
+  "server": {
+    "type": "python",
+    "entry_point": "src/nuki_mcp/main.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run","--directory","${PWD}","python","-m","nuki_mcp"],
+      "env": {
+        "PYTHONPATH": "${PWD}/src",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  },
+  "tools": [
+    { "name": "get_lock_status", "description": "get_lock_status" },
+    { "name": "set_lock_state", "description": "set_lock_state" },
+    { "name": "buzz_opener", "description": "buzz_opener" },
+    { "name": "smart_entry_sequence", "description": "smart_entry_sequence" }
+  ]
+}

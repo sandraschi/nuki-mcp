@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import AsyncMock, patch
+
+import pytest
+
 from nuki_mcp.bridge.hass import HomeAssistantBridge
 
 
@@ -10,9 +12,7 @@ async def test_get_state_success():
 
     with patch("aiohttp.ClientSession.get") as mock_get:
         mock_get.return_value.__aenter__.return_value.status = 200
-        mock_get.return_value.__aenter__.return_value.json = AsyncMock(
-            return_value=mock_response
-        )
+        mock_get.return_value.__aenter__.return_value.json = AsyncMock(return_value=mock_response)
 
         state = await bridge.get_state("lock.front_door")
         assert state == mock_response

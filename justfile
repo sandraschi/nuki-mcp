@@ -1,4 +1,5 @@
-﻿set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
+set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
+import 'scripts/just/fleet.just'
 
 # Open the interactive recipe dashboard in the browser
 default:
@@ -72,13 +73,5 @@ buzz entity_id="lock.main_door":
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
 
-mcpb-pack:
-    cd '{{justfile_directory()}}'
-    $ver = (Get-Content pyproject.toml | Select-String '^version = "(.*)"' | ForEach-Object { $$_.Matches.Groups[1].Value }); \
-    $null = New-Item -ItemType Directory -Path dist -Force; \
-    Compress-Archive -Path manifest.json, assets, src, pyproject.toml -DestinationPath "dist/nuki-mcp-v$ver.mcpb" -CompressionLevel Optimal -Force; \
-    Write-Host "Created dist/nuki-mcp-v$ver.mcpb" -ForegroundColor Green
-
 install-mcp client="print":
     .\install-mcp.ps1 '{{client}}'
-

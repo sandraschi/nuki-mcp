@@ -19,6 +19,7 @@ const navItems = [
     { icon: Settings, label: 'Tools Hub', path: '/tools' },
     { icon: MessageSquare, label: 'LLM Chat', path: '/chat' },
     { icon: Activity, label: 'Status', path: '/status' },
+    { icon: Activity, label: 'Logging', path: '/logging' },
 ];
 
 export const Sidebar: React.FC = () => {

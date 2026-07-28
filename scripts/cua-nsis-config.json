@@ -1,0 +1,14 @@
+{
+    "product_name": "Nuki MCP",
+    "install_dir": "%LOCALAPPDATA%\\Nuki MCP",
+    "operator_exe": "nuki-mcp-native.exe",
+    "backend_process_names": ["nuki-mcp-native", "nuki-mcp-backend"],
+    "backend_port": 10700,
+    "health_path": "/api/v1/health",
+    "diagnostics_path": "/api/v1/diagnostics",
+    "feature_smoke_path": "/api/v1/system/info",
+    "window_title_re": "Nuki MCP",
+    "nsis_glob": "native/target/release/bundle/nsis/Nuki MCP_*_x64-setup.exe",
+    "bridge_ok_text": "REST bridge reachable",
+    "uninstall_registry_filter": "*Nuki MCP*"
+}
