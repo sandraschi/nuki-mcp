@@ -5,7 +5,7 @@ import 'scripts/just/fleet.just'
 default:
     @just --list
 
-# ── Quality ───────────────────────────────────────────────────────────────────
+# --- Quality ---
 
 # Ruff lint
 lint:
@@ -18,13 +18,13 @@ fix:
     uv run ruff check --fix src/
     uv run ruff format src/
 
-# ── Testing ───────────────────────────────────────────────────────────────────
+# --- Testing ---
 
 test:
     cd '{{justfile_directory()}}'
     uv run pytest
 
-# ── Serving ───────────────────────────────────────────────────────────────────
+# --- Serving ---
 
 # Start backend (stdio)
 stdio:
@@ -36,7 +36,7 @@ dev:
     cd '{{justfile_directory()}}\web_sota'
     .\start.ps1
 
-# ── Python ───────────────────────────────────────────────────────────────────
+# --- Python ---
 
 # Install all deps after clone
 install:
@@ -49,7 +49,7 @@ sync:
     cd '{{justfile_directory()}}'
     uv sync
 
-# ── Nuki ─────────────────────────────────────────────────────────────────────
+# --- Nuki ---
 
 # Show lock status
 lock-status entity_id="lock.front_door":
@@ -71,7 +71,13 @@ buzz entity_id="lock.main_door":
     cd '{{justfile_directory()}}'
     uv run python -c "import asyncio; from nuki_mcp.bridge.hass import HomeAssistantBridge; import os; b=HomeAssistantBridge(os.getenv('HASS_URL','http://homeassistant.local:8123'),os.getenv('HASS_TOKEN','')); print(asyncio.run(b.call_service('lock','open','{{entity_id}}')))"
 
-# ── Utilities ─────────────────────────────────────────────────────────────────
+# --- Utilities ---
 
 install-mcp client="print":
     .\install-mcp.ps1 '{{client}}'
+
+# Bootstrap: install dev deps + pre-commit hook
+bootstrap:
+    uv sync --group dev
+    uv run pre-commit install
+    Write-Host "Pre-commit hooks installed." -ForegroundColor Green
