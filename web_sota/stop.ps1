@@ -7,4 +7,4 @@ if (-not (Test-Path -LiteralPath $FleetStartPath)) {
 }
 . $FleetStartPath
 
-if (-not (Stop-FleetPortListeners -Ports @(10980, 10894) -Label "nuki-mcp")) { exit 1 }
+if (-not (Stop-FleetPortListeners -Ports @(10785, 10786) -Label "nuki-mcp")) { exit 1 }

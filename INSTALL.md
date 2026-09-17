@@ -47,9 +47,9 @@ If you prefer not to use `just`:
    uv run python -m nuki_mcp.server
 
    # HTTP mode (for web dashboard)
-   uv run uvicorn nuki_mcp.server:app --port 10980
+   uv run uvicorn nuki_mcp.server:app --port 10785
    ```
-5. Open `http://localhost:10980` or the frontend URL.
+5. Open `http://localhost:10785` or the frontend URL.
 
 ---
 
