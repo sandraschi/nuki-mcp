@@ -6,8 +6,8 @@ if ($Headless -and ($Host.UI.RawUI.WindowTitle -notmatch 'Hidden')) {
 }
 $WindowStyle = if ($Headless) { 'Hidden' } else { 'Normal' }
 
-$WebPort = 10785
-$BackendPort = 10786
+$WebPort = 11202
+$BackendPort = 11203
 $FleetStartPath = Join-Path $ProjectRoot "scripts\FleetStartMode.ps1"
 if (-not (Test-Path -LiteralPath $FleetStartPath)) {
     Write-Host "ERROR: Missing vendored launcher helper: $FleetStartPath" -ForegroundColor Red

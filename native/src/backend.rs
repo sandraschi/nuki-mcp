@@ -13,7 +13,7 @@ pub struct BackendProcess(pub Mutex<Option<Child>>);
 
 // -- PER-REPO: Customize these constants --
 const BACKEND_NAME: &str = "nuki-mcp-backend.exe";
-const BACKEND_PORT: u16 = 10785;
+const BACKEND_PORT: u16 = 11202;
 const BACKEND_TAG: &str = "nuki-mcp-backend-x86_64-pc-windows-msvc.exe";
 const ENV_PORT: &str = "NUKI_MCP_PORT";
 const ENV_HOST: &str = "NUKI_MCP_HOST";

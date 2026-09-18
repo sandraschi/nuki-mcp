@@ -2,15 +2,15 @@
 # Edit ports/backend target here - start.ps1 is fleet-standard.
 @{
     Name         = 'nuki-mcp'
-    BackendPort  = 10786
-    FrontendPort = 10785
+    BackendPort  = 11203
+    FrontendPort = 11202
     HealthPath   = '/health'
     WebRoot      = 'web_sota'
     Backend = @{
         Kind          = 'uvicorn'
         UvicornTarget = 'nuki_mcp.main:app'
         SyncExtras    = @('dev')
-        Env           = @{ WEB_PORT = '10786' }
+        Env           = @{ WEB_PORT = '11203' }
     }
     Frontend = @{
         Kind           = 'vite-npm'
